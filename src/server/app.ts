@@ -28,4 +28,25 @@ app.get("/api/items", (req, res) => {
   setTimeout(() => res.json(["apple", "banana", "cherry"]), delay);
 });
 
+// A more realistic page: two requests in a chain (a "waterfall"), like most real apps
+app.get("/dashboard", (req, res) => {
+  res.send(`
+    <h1>Flaky Dashboard</h1>
+    <p id="status">loading...</p>
+    <script>
+      fetch("/api/user")
+        .then(r => r.json())
+        .then(user => fetch("/api/items?user=" + user.id))
+        .then(r => r.json())
+        .then(items => {
+          document.getElementById("status").textContent = items.length + " items";
+        });
+    </script>
+  `);
+});
+
+app.get("/api/user", (req, res) => {
+  setTimeout(() => res.json({ id: 42 }), 100);
+});
+
 app.listen(3000, () => console.log("Flaky Shop running at http://localhost:3000"));
