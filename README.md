@@ -37,7 +37,20 @@ A fixed sleep is always the wrong length:
 
 Zeitaku is **45% faster than the only fixed wait that doesn't fail**, and it never fails.
 
-### 2. Real test runner, before and after `zeitaku fix`
+### 2. Slow networks: a realistic two-request waterfall under Chrome's "Slow 3G" preset (20 runs each)
+
+| Network | Wait strategy | Avg time | Failure rate |
+|---|---|---|---|
+| Normal | `waitForTimeout(2000)` | 2071 ms | 25% |
+| Normal | `waitForTimeout(3000)` | 3058 ms | 0% |
+| Normal | **Zeitaku `idle()`** | **1634 ms** | **0%** |
+| **Slow 3G** | `waitForTimeout(2000)` | 4093 ms | **100%** |
+| **Slow 3G** | `waitForTimeout(3000)` | 5102 ms | **100%** |
+| **Slow 3G** | **Zeitaku `idle()`** | 7089 ms | **0%** |
+
+**No fixed sleep works on both a fast and a slow network.** On Slow 3G every fixed sleep fails, while Zeitaku waits exactly as long as the page actually needs and never fails. Throttling uses CDP's `Network.emulateNetworkConditions` (2 s latency, ~400 kbit/s), which is the same mechanism as Chrome DevTools' throttling dropdown.
+
+### 3. Real test runner, before and after `zeitaku fix`
 
 The same Playwright test, run 20 times (`--repeat-each 20`):
 
@@ -46,7 +59,7 @@ The same Playwright test, run 20 times (`--repeat-each 20`):
 | Before (`waitForTimeout(2000)`) | **2 failed**, 18 passed: `Expected "3 items", Received "loading..."` |
 | After `zeitaku fix --write` | **20 passed**, 0 failed |
 
-### 3. Hard-coded sleeps in real open-source codebases
+### 4. Hard-coded sleeps in real open-source codebases
 
 The Zeitaku scanner on 7 open-source products (shallow clones, scanned Oct 2026):
 
@@ -132,10 +145,11 @@ npx tsx src/cli/fix.ts e2e --write          # rewrite the test
 npx playwright test e2e --repeat-each 20    # after: all pass
 ```
 
-**Run the benchmark:**
+**Run the benchmarks** (server running in another terminal):
 
 ```bash
-npx tsx src/bench/bench.ts
+npx tsx src/bench/bench.ts      # normal network, 50 runs
+npx tsx src/bench/bench3g.ts    # normal vs Slow 3G, waterfall page
 ```
 
 ## Project structure
@@ -149,6 +163,7 @@ src/
   runtime/zeitaku.ts  CDP network tracker: attach() + idle()
   server/app.ts       Flaky demo server (Express)
   bench/bench.ts      Fixed waits vs Zeitaku, N runs each
+  bench/bench3g.ts    Same, on normal vs throttled Slow 3G (CDP)
 e2e/shop.spec.ts      Demo Playwright test
 ```
 

@@ -1,0 +1,14 @@
+import { test, expect } from "@playwright/test";
+import { __zeitaku } from "../src/runtime/zeitaku";
+
+test.beforeEach(async ({ page }) => { await __zeitaku.attach(page); });
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus) console.log(__zeitaku.diagnose(page));
+});
+
+test("shop shows 3 items", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await page.waitForTimeout(1000);
+  const status = await page.textContent("#status");
+  expect(status).toBe("3 items");
+});

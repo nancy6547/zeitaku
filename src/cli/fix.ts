@@ -55,7 +55,10 @@ function fixFile(file: string): number {
   if (!rel.startsWith(".")) rel = "./" + rel;
   const header =
     'import { __zeitaku } from "' + rel + '";\n' +
-    "test.beforeEach(async ({ page }) => { await __zeitaku.attach(page); });\n";
+    "test.beforeEach(async ({ page }) => { await __zeitaku.attach(page); });\n" +
+    "test.afterEach(async ({ page }, testInfo) => {\n" +
+    "  if (testInfo.status !== testInfo.expectedStatus) console.log(__zeitaku.diagnose(page));\n" +
+    "});\n";
 
   // Put the header right after the last import (works with any line endings)
   const lastImport = sourceFile.statements.filter(ts.isImportDeclaration).pop();
