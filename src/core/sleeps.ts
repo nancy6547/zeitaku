@@ -17,7 +17,7 @@ const LOOKAHEAD = 3;
 // Does this piece of code check that something did NOT happen?
 // e.g. expect(x).toBeHidden(), expect(x).not.toBeVisible(), expect(count).toBeLessThanOrEqual(1)
 export function isNegativeCheck(code: string): boolean {
-  const patterns = [".toBeHidden(", ".not.", ".toBeLessThan", ".toHaveCount(0)", ".toBeFalsy(", ".toBeNull("];
+  const patterns = [".toBeHidden(", ".not.", ".toBeLessThan", ".toHaveCount(0)", ".toHaveLength(0)", ".toBeFalsy(", ".toBeNull("];
   return patterns.some((p) => code.includes(p));
 }
 

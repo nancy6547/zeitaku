@@ -43,6 +43,13 @@ await page.click("#go");`);
 
     expect(sleeps[0].kind).toBe("replaceable");
   });
+
+  it("treats toHaveLength(0) as a negative check", () => {
+    const sleeps = findSleeps(`await page.waitForTimeout(750);
+expect(searchRequests).toHaveLength(0);`);
+
+    expect(sleeps[0].kind).toBe("intentional");
+  });
 });
 
 describe("fixCode", () => {
