@@ -6,9 +6,12 @@
 
 Zeitaku reads your test files as a syntax tree (TypeScript Compiler API), rewrites every `page.waitForTimeout(N)` into a smart wait, and at runtime uses the Chrome DevTools Protocol to continue the moment the page's network actually goes quiet. You end up with tests that are faster *and* less flaky.
 
+Run it on any project, with no install needed:
+
 ```bash
-npx tsx src/cli/fix.ts ./tests            # preview what would change
-npx tsx src/cli/fix.ts ./tests --write    # apply it
+npx github:nancy6547/zeitaku scan ./tests           # find every hard-coded sleep
+npx github:nancy6547/zeitaku fix ./tests            # preview what would change
+npx github:nancy6547/zeitaku fix ./tests --write    # apply it
 ```
 
 ---
@@ -86,7 +89,7 @@ The Zeitaku scanner on 7 open-source products (shallow clones, scanned Oct 2026)
 | Supabase | 8,526 | 11 | 36 | 37.3 s |
 | n8n | 22,452 | 13 | 25 | 15.8 s |
 | Formbricks | 4,322 | 6 | 19 | 23.8 s |
-| Cal.com | 5,055 | 6 | 18 | 20.5 s |
+| Cal.com (now the community fork Cal.diy) | 5,055 | 6 | 18 | 20.5 s |
 | Immich | 1,093 | 3 | 4 | 0.4 s |
 | Twenty | 32,265 | 1 | 1 | 2.5 s |
 | **Total** | **75,941** | **74** | **240** | **306.5 s** |
