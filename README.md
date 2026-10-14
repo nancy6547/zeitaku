@@ -59,7 +59,22 @@ The same Playwright test, run 20 times (`--repeat-each 20`):
 | Before (`waitForTimeout(2000)`) | **2 failed**, 18 passed: `Expected "3 items", Received "loading..."` |
 | After `zeitaku fix --write` | **20 passed**, 0 failed |
 
-### 4. Hard-coded sleeps in real open-source codebases
+### 4. Flake diagnosis: *why* did it fail?
+
+When a test fails, Zeitaku reports which requests were still in flight and for how long. You can tell a network-timing flake from a real bug at a glance:
+
+```
+Zeitaku: 1 request(s) still in flight at failure:
+  - http://localhost:3000/api/items  (in flight for 1110ms)
+
+  Error: expect(received).toBe(expected)
+  Expected: "3 items"
+  Received: "loading..."
+```
+
+If nothing was in flight, it says so: *"failure is probably not network timing."* `zeitaku fix` injects this as a `test.afterEach` hook, and it only prints on failure. Try it with `npx playwright test e2e-diagnose --repeat-each 5`.
+
+### 5. Hard-coded sleeps in real open-source codebases
 
 The Zeitaku scanner on 7 open-source products (shallow clones, scanned Oct 2026):
 
@@ -164,7 +179,8 @@ src/
   server/app.ts       Flaky demo server (Express)
   bench/bench.ts      Fixed waits vs Zeitaku, N runs each
   bench/bench3g.ts    Same, on normal vs throttled Slow 3G (CDP)
-e2e/shop.spec.ts      Demo Playwright test
+e2e/shop.spec.ts            Demo Playwright test (before/after fix)
+e2e-diagnose/shop.spec.ts   Deliberately flaky test showing flake diagnosis
 ```
 
 **Stack:** TypeScript · Node.js · TypeScript Compiler API (`typescript@6`) · Playwright · Chrome DevTools Protocol · Express
@@ -180,7 +196,7 @@ e2e/shop.spec.ts      Demo Playwright test
 
 ## Roadmap
 
-- [ ] **Flake diagnosis:** when a test fails, report which requests were still pending (*"failed while `/api/items` was in flight for 1.8s"*)
+- [x] **Flake diagnosis:** when a test fails, report which requests were still pending
 - [ ] Ship as a Playwright fixture / npm package instead of an injected import
 - [ ] Rewrite other sleep patterns (`setTimeout` promise sleeps, `sleep()` helpers)
 - [ ] Run against a real repo's suite end to end and publish the timing diff
