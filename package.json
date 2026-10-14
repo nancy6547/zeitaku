@@ -1,14 +1,38 @@
 {
   "name": "zeitaku",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "vitest run"
+  "version": "0.1.0",
+  "description": "Find hard-coded Playwright sleeps and replace them with network-aware waits (TypeScript AST + Chrome DevTools Protocol)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "zeitaku": "dist/cli/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "files": [
+    "dist"
+  ],
+    "scripts": {
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build && npm test",
+    "prepare": "npm run build"
+  },"keywords": [
+    "playwright",
+    "testing",
+    "flaky-tests",
+    "codemod",
+    "cdp",
+    "typescript"
+  ],
+  "author": "Nancy Singh",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nancy6547/zeitaku.git"
+  },
+  "homepage": "https://github.com/nancy6547/zeitaku#readme",
+  "peerDependencies": {
+    "@playwright/test": ">=1.40.0"
+  },
   "dependencies": {
     "typescript": "^6.0.3"
   },
