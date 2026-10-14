@@ -96,6 +96,31 @@ The Zeitaku scanner on 7 open-source products (shallow clones, scanned Oct 2026)
 
 *"Sleep in source" sums the numeric arguments written in the code. Actual runtime cost can be higher (sleeps inside helpers or loops run repeatedly) or lower (skipped tests).*
 
+### 6. Not every sleep should be replaced
+
+Reading these real test suites showed that some sleeps are **intentional**: they guard a check that something did **not** happen.
+
+```ts
+// Documenso: "we must NOT navigate to a new user detail page"
+await page.waitForTimeout(1000);
+await expect(page).not.toHaveURL(/\/admin\/users\/\d+$/);
+```
+
+Replacing that sleep with "continue when the network is idle" would let the assertion run too early and **pass when it should fail**. So Zeitaku classifies every sleep by the statements that follow it. Sleeps before negative checks (`toBeHidden`, `.not.…`, `toBeLessThan…`, `toHaveCount(0)`, `toHaveLength(0)`, …) are marked **intentional** and left untouched by `fix`.
+
+| Project | Replaceable | Intentional (left alone) |
+|---|---|---|
+| Documenso | 104 | 33 |
+| Supabase | 30 | 6 |
+| Cal.com / Cal.diy | 15 | 3 |
+| n8n | 24 | 1 |
+| Formbricks | 18 | 1 |
+| Immich | 4 | 0 |
+| Twenty | 1 | 0 |
+| **Total** | **196** | **44** |
+
+Roughly **1 in 6** real-world sleeps is intentional. A naive rewrite would have silently weakened 44 tests.
+
 ---
 
 ## How it works
