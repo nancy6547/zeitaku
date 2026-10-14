@@ -1,5 +1,7 @@
 # Zeitaku
 
+[![tests](https://github.com/nancy6547/zeitaku/actions/workflows/test.yml/badge.svg)](https://github.com/nancy6547/zeitaku/actions/workflows/test.yml)
+
 **Find hard-coded sleeps in Playwright tests and replace them with network-aware waits, automatically.**
 
 Zeitaku reads your test files as a syntax tree (TypeScript Compiler API), rewrites every `page.waitForTimeout(N)` into a smart wait, and at runtime uses the Chrome DevTools Protocol to continue the moment the page's network actually goes quiet. You end up with tests that are faster *and* less flaky.

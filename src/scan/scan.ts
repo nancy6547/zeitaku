@@ -20,6 +20,7 @@ function findCodeFiles(dir: string): string[] {
 }
 
 let totalWaits = 0;
+let intentional = 0;
 let totalMs = 0;
 let filesWithWaits = 0;
 const files = findCodeFiles(root);
@@ -29,7 +30,10 @@ for (const file of files) {
   if (sleeps.length > 0) {
     filesWithWaits++;
     totalWaits += sleeps.length;
-    for (const s of sleeps) totalMs += s.ms ?? 0;
+    for (const s of sleeps) {
+      totalMs += s.ms ?? 0;
+      if (s.kind === "intentional") intentional++;
+    }
     console.log(sleeps.length + " waits  " + path.relative(root, file));
   }
 }
@@ -38,4 +42,6 @@ console.log("----");
 console.log("Files scanned:          " + files.length);
 console.log("Files with hard waits:  " + filesWithWaits);
 console.log("Total waitForTimeout:   " + totalWaits);
+console.log("  replaceable:          " + (totalWaits - intentional));
+console.log("  intentional:          " + intentional + "  (guard a 'should NOT happen' check, left alone)");
 console.log("Hard-coded sleep time:  " + (totalMs / 1000).toFixed(1) + "s");

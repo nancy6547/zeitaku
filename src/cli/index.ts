@@ -36,20 +36,25 @@ function walk(dir: string, pattern: RegExp): string[] {
 
 if (command === "scan") {
   const files = walk(folder, /\.(ts|tsx|js)$/);
-  let total = 0, totalMs = 0, withWaits = 0;
+  let total = 0, totalMs = 0, withWaits = 0, intentional = 0;
   for (const file of files) {
     const sleeps = findSleeps(fs.readFileSync(file, "utf8"), file);
     if (sleeps.length === 0) continue;
     withWaits++;
     total += sleeps.length;
-    for (const s of sleeps) totalMs += s.ms ?? 0;
+    for (const s of sleeps) {
+      totalMs += s.ms ?? 0;
+      if (s.kind === "intentional") intentional++;
+    }
     console.log(sleeps.length + " waits  " + path.relative(folder, file));
   }
   console.log("----");
   console.log("Files scanned:          " + files.length);
   console.log("Files with hard waits:  " + withWaits);
   console.log("Total waitForTimeout:   " + total);
-  console.log("Hard-coded sleep time:  " + (totalMs / 1000).toFixed(1) + "s");
+  console.log("  replaceable:          " + (total - intentional));
+console.log("  intentional:          " + intentional + "  (guard a 'should NOT happen' check, left alone)");
+console.log("Hard-coded sleep time:  " + (totalMs / 1000).toFixed(1) + "s");
 }
 
 if (command === "fix") {

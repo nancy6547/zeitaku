@@ -30,6 +30,19 @@ console.log("page.waitForTimeout(5)");`);
 
     expect(sleeps[0].ms).toBeNull();
   });
+  it("marks a sleep before a negative check as intentional", () => {
+    const sleeps = findSleeps(`await page.waitForTimeout(500);
+await expect(menu).toBeHidden();`);
+
+    expect(sleeps[0].kind).toBe("intentional");
+  });
+
+  it("marks a normal sleep as replaceable", () => {
+    const sleeps = findSleeps(`await page.waitForTimeout(500);
+await page.click("#go");`);
+
+    expect(sleeps[0].kind).toBe("replaceable");
+  });
 });
 
 describe("fixCode", () => {
