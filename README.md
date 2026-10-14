@@ -224,6 +224,10 @@ e2e-diagnose/shop.spec.ts   Deliberately flaky test showing flake diagnosis
 - **Playwright already auto-waits on actions and on web-first assertions** (`expect(locator).toHaveText`). Zeitaku targets the fixed sleeps people add anyway, plus non-retrying reads like `page.textContent()`.
 - Only `waitForTimeout` is rewritten so far.
 
+## Next: Junban
+
+Zeitaku tells you which request was still in flight when a test failed. Its follow-up, [Junban](https://github.com/nancy6547/junban), finds the exact order of API responses that makes a flaky test fail and writes a Playwright test that fails every time. On races that show up a few times per thousand runs, it caught 6/6 within 5 runs; plain reruns caught 2 in 3,000.
+
 ## Roadmap
 
 - [x] **Flake diagnosis:** when a test fails, report which requests were still pending
